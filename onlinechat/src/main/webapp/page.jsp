@@ -13,8 +13,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
    
   <body>
     Welcome<br/>
-    <input id="text" type="text" /><button onclick="send()">Send</button>
-    <button onclick="closeWebSocket()">Close</button>
+    <input id="text" type="text" /><button onclick="send()">Send</button>    <button onclick="closeWebSocket()">Close</button>
     <div id="message">
     </div>
   </body>
@@ -22,50 +21,50 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   <script type="text/javascript">
       var websocket = null;
        
-      //check browser support WebSocket
+      //判断当前浏览器是否支持WebSocket
       if('WebSocket' in window){
-          websocket = new WebSocket("ws://172.19.35.29:8080/onlinechat/websocket");
+          websocket = new WebSocket("ws://localhost:8080/MyWebSocket/websocket");
       }
       else{
           alert('Not support websocket')
       }
        
-      //connection error
-      websocket.onerror = function(){
+      //连接发生错误的回调方法
+      websocket.onerror = function(event){
           setMessageInnerHTML("error");
       };
        
-      //connection ok
-      websocket.onopen = function(){
+      //连接成功建立的回调方法
+      websocket.onopen = function(event){
           setMessageInnerHTML("open");
       }
        
-      //receive message
+      //接收到消息的回调方法
       websocket.onmessage = function(event){
           setMessageInnerHTML(event.data);
       }
        
-      //close
-      websocket.onclose = function(){
+      //连接关闭的回调方法
+      websocket.onclose = function(event){
           setMessageInnerHTML("close");
       }
        
-      //listen windown, when force close window, close websocket connection
-      window.onbeforeunload = function(){
+      //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
+      window.onbeforeunload = function(event){
           websocket.close();
       }
        
-      //show message on page
+      //将消息显示在网页上
       function setMessageInnerHTML(innerHTML){
           document.getElementById('message').innerHTML += innerHTML + '<br/>';
       }
        
-      //close connection
-      function closeWebSocket(){
+      //关闭连接
+      function closeWebSocket(event){
           websocket.close();
       }
        
-      //send message
+      //发送消息
       function send(){
           var message = document.getElementById('text').value;
           websocket.send(message);
