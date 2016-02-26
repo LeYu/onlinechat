@@ -4,6 +4,7 @@
 	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
 	//测试用,后续应该从LOGIN_SERVLET存取,在这个地方读取
 	request.getSession().setAttribute("LOGIN_USER",request.getParameter("from"));	//test 上线请删除
+	String msgFrom = (String)request.getSession().getAttribute("LOGIN_USER");
 	//从URL获取消息接收人ID
 	String msgTo = request.getParameter("to");
 	Set<String> tos = null;
@@ -30,7 +31,13 @@
 	<button type="button" class="btn btn-sm btn-primary" onclick="sendMessage()">Send</button>
 	<button type="button" class="btn btn-sm btn-danger" onclick="closeWebSocket()">Close</button>
 	<button type="button" class="btn btn-sm btn-warning" onclick="reConnect()">Re-connect</button>
-	<h4 id="message"></h4>
+	<!-- <h4 id="message"></h4> -->
+	<div data-role="content" class="container" role="main">
+	<ul class="content-reply-box mg10" id="message">
+		
+	</ul>
+	</div>
+  </div>
 </div>
 </body>
 
@@ -102,10 +109,37 @@
 	
 	function writeToScreen(message) {
 		//<span class="label label-primary">Primary</span>
-		var pre = document.createElement("span");
+		var pre = document.createElement("li");
 		//pre.style.wordWrap = "break-word";
 		//pre.className = "label label-info";
-		pre.className = "label label-primary";
+		var img = document.createElement("img");
+		var span = document.createElement("span");
+		span.className = "user-name";
+		if(message.from != '<%=msgFrom%>'){
+			pre.className = "odd";
+			img.className = "img-responsive avatar_";
+			img.alt = "";
+			img.src = "<%=basePath%>/resources/images/"+message.from+".png";
+			span.innerHTML = message.from;
+		}else{
+			pre.className = "even";
+			img.className = "img-responsive avatar_";
+			img.alt = "";
+			img.src = "<%=basePath%>/resources/images/"+message.to+".png";
+			span.innerHTML = message.to;
+		}
+		pre.appendChild(img);
+		pre.appendChild(span);
+		var div = document.createElement("div");
+		div.className = "reply-content-box";
+		var spanS = document.createElement("span");
+		spans.className = "reply-time";
+		spans.innerHTML = "";
+		div.appendChild(spanS);
+		
+		
+		
+		
 		if(message instanceof Object){
 			//pre.innerHTML = JSON.stringify(message);
 			pre.innerHTML += timestampformat(message.sendDate) +" "; 
