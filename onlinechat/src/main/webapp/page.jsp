@@ -1,33 +1,42 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://"
-			+ request.getServerName() + ":" + request.getServerPort()
-			+ path + "/";
-	String name = request.getParameter("name");
-	request.getSession().setAttribute("name","Session_"+name);
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path;
+	//测试用,后续应该从LOGIN_SERVLET存取,在这个地方读取
+	request.getSession().setAttribute("LOGIN_USER",request.getParameter("from"));	//test 上线请删除
+	//从URL获取消息接收人ID
+	String msgTo = request.getParameter("to");
+	Set<String> tos = null;
+	//判断Session是否存在历史会话,可以从DB中读取历史记录
+	if(request.getSession().getAttribute("LOGIN_USER_CONVERSATION") != null){
+		//加入当前用户到
+		tos = (java.util.HashSet<String>)request.getSession().getAttribute("LOGIN_USER_CONVERSATION");
+	} else {
+		tos = new java.util.HashSet<String>();
+	}
+	tos.add(msgTo);
+	request.getSession().setAttribute("LOGIN_USER_CONVERSATION",tos);
 %>
-
 <!DOCTYPE HTML>
 <html>
 <head>
 <base href="<%=basePath%>">
-<title>My WebSocket</title>
-
+<meta http-equiv="Content-Type" content="text/html;" charset="UTF-8">
+<title>Online Chat @WebSocket</title>
 </head>
 <body>
-	Welcome
-	<br />
-	<input id="text" type="text" />
-	<button onclick="sendMessage()">Send</button>
-	<button onclick="closeWebSocket()">Close</button>
-	<button onclick="reConnect()">re-connect</button>
-	<div id="message"></div>
+<div class="container">
+	<input type="text" id="text" class="form-control" placeholder="Please input message here">
+	<button type="button" class="btn btn-sm btn-primary" onclick="sendMessage()">Send</button>
+	<button type="button" class="btn btn-sm btn-danger" onclick="closeWebSocket()">Close</button>
+	<button type="button" class="btn btn-sm btn-warning" onclick="reConnect()">Re-connect</button>
+	<h4 id="message"></h4>
+</div>
 </body>
 
 <script type="text/javascript">
-	var username = '<%=name%>';
-	var wsUri = 'ws://localhost:8080/onlinechat/websocket/' + username;
+	var msgTo = '<%=msgTo%>';
+	var wsUri = 'ws://localhost:8080/onlinechat/websocket/' + msgTo;
 	var output;
 
 	function init() {
@@ -45,9 +54,10 @@
 	}
 
 	function initWebSocket() {
-		if ('WebSocket' in window) {
+		window.WebSocket = window.WebSocket || window.MozWebSocket;
+		//if ('WebSocket' in window || 'MozWebSocket' in window)
+		if (window.WebSocket) {
 			websocket = new WebSocket(wsUri);
-			
 			writeToScreen("You have connectted to server, welcome");
 			//attach event handlers
 			websocket.onopen = onOpen;
@@ -60,6 +70,7 @@
 		    };
 		} else {
 			alert("WebSockets not supported on your browser.");
+			return;
 		}
 	}
 
@@ -75,7 +86,7 @@
 	}
 	function onMessage(evt) {
 		//called on receipt of message
-		writeToScreen(evt.data);
+		writeToScreen(JSON.parse(evt.data));
 	}
 	function onError(evt) {
 		//called on error
@@ -83,15 +94,29 @@
 	}
 
 	function sendMessage() {
-		var msg = document.getElementById('text').value;
-		websocket.send("{\"message\": \"" + msg + "\",\"type\":\"USER\"}");
+		var msg = {
+				"content"	:	document.getElementById('text').value
+		};
+		websocket.send(JSON.stringify(msg));
 	}
 	
 	function writeToScreen(message) {
-		var pre = document.createElement("p");
-		pre.style.wordWrap = "break-word";
-		pre.innerHTML = message;
+		//<span class="label label-primary">Primary</span>
+		var pre = document.createElement("span");
+		//pre.style.wordWrap = "break-word";
+		//pre.className = "label label-info";
+		pre.className = "label label-primary";
+		if(message instanceof Object){
+			//pre.innerHTML = JSON.stringify(message);
+			pre.innerHTML += timestampformat(message.sendDate) +" "; 
+			pre.innerHTML += message.from + " " ;
+			pre.innerHTML += "@" + message.to + " :" ;
+			pre.innerHTML += message.content;
+		}else {
+			pre.innerHTML = message;
+		}
 		output.appendChild(pre);
+		output.appendChild(document.createElement("p"));
 	}
 	
 	function closeWebSocket(){
@@ -132,5 +157,14 @@
 	    return (new Date(timestamp)).format("yyyy-MM-dd hh:mm:ss");
 	} 
 </script>
-<script type="text/javascript" src="<%=basePath %>jquery-1.8.0.js" />
+<style>
+.container {
+    width: 600px;
+}
+</style>
+<link rel="stylesheet" href="<%=basePath%>/resources/css/bootstrap.min.css" type="text/css">
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="<%=basePath%>/resources/js/jquery-1.12.1.js" ></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="<%=basePath%>/resources/js/bootstrap.min.js" ></script>
 </html>

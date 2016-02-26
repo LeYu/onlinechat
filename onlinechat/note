@@ -1,0 +1,38 @@
+//因为网络问题或者服务器宕机的原因，客户端连接被切断，此时我们可以在捕获close事件后，试图重新建立连接，如下面代码所示：
+socket.onclose = function() {
+	setTimeout(function() {
+		//reconnect operation
+	}, 100000);
+}
+
+http://www.blogjava.net/TWaver/archive/2012/05/03/377244.html
+WebSocket浏览器支持
+IE 10+
+Firefox 6+
+Chrome 14+
+Safari 5+
+Safari mobile ios 4.2+
+
+检测浏览器是否支持WebSocket
+method 1:
+window.WebSocket = window.WebSocket || window.MozWebSocket;
+if (window.WebSocket){
+	//dosomething
+}
+method 2:
+if ('WebSocket' in window || 'MozWebSocket' in window){
+	//dosomething
+}
+
+
+<%@ page import="java.util.HashSet" %>
+
+
+方式一：
+  ArrayList<String> list = new ArrayList<String>();
+  String str01 = String("str01");
+  String str02 = String("str02");
+  list.add(str01);
+  list.add(str02);
+方式二：
+  ArrayList<String> list = new ArrayList<String>(){{add("str01"); add("str02");}};  
