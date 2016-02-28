@@ -32,13 +32,16 @@
 	<button type="button" class="btn btn-sm btn-danger" onclick="closeWebSocket()">Close</button>
 	<button type="button" class="btn btn-sm btn-warning" onclick="reConnect()">Re-connect</button>
 	<!-- <h4 id="message"></h4> -->
-	<div data-role="content" class="container" role="main">
-	<ul class="content-reply-box mg10" id="message">
-		
-	</ul>
-	</div>
-  </div>
 </div>
+
+</div>
+	
+<div data-role="content" class="container" role="main">
+	<ul class="content-reply-box mg10" id="message">
+	
+	</ul>
+</div>
+
 </body>
 
 <script type="text/javascript">
@@ -128,29 +131,42 @@
 			img.src = "<%=basePath%>/resources/images/"+message.to+".png";
 			span.innerHTML = message.to;
 		}
-		pre.appendChild(img);
-		pre.appendChild(span);
+		var a = document.createElement("a");
+		a.className = "user";
+		a.href = "javascript:void(0);";
+		a.appendChild(img);
+		a.appendChild(span);
+		pre.appendChild(a);
 		var div = document.createElement("div");
 		div.className = "reply-content-box";
 		var spanS = document.createElement("span");
-		spans.className = "reply-time";
-		spans.innerHTML = "";
+		spanS.className = "reply-time";
+		spanS.innerHTML = "";
 		div.appendChild(spanS);
+		var divx = document.createElement("div");
+		divx.className = "reply-content pr";
 		
+		var spanx = document.createElement("span");
+		spanx.className = "arrow";
+		spanx.innerHTML = "&nbsp";
+		divx.appendChild(spanx);
 		
-		
-		
+		var content = document.createElement("span");
 		if(message instanceof Object){
 			//pre.innerHTML = JSON.stringify(message);
-			pre.innerHTML += timestampformat(message.sendDate) +" "; 
-			pre.innerHTML += message.from + " " ;
-			pre.innerHTML += "@" + message.to + " :" ;
-			pre.innerHTML += message.content;
+			content.innerHTML += timestampformat(message.sendDate) +" "; 
+			content.innerHTML += message.from + " " ;
+			content.innerHTML += "@" + message.to + " :" ;
+			content.innerHTML += message.content;
 		}else {
-			pre.innerHTML = message;
+			content.innerHTML = message;
 		}
+		divx.appendChild(content);
+		div.appendChild(divx);
+		pre.appendChild(div);
+		
 		output.appendChild(pre);
-		output.appendChild(document.createElement("p"));
+		
 	}
 	
 	function closeWebSocket(){
@@ -197,6 +213,8 @@
 }
 </style>
 <link rel="stylesheet" href="<%=basePath%>/resources/css/bootstrap.min.css" type="text/css">
+
+<link rel="stylesheet" href="<%=basePath%>/resources/css/style.css" type="text/css">
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="<%=basePath%>/resources/js/jquery-1.12.1.js" ></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
