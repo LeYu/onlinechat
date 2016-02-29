@@ -120,17 +120,13 @@
 		span.className = "user-name";
 		if(message.from != '<%=msgFrom%>'){
 			pre.className = "odd";
-			img.className = "img-responsive avatar_";
-			img.alt = "";
-			img.src = "<%=basePath%>/resources/images/"+message.from+".png";
-			span.innerHTML = message.from;
 		}else{
 			pre.className = "even";
-			img.className = "img-responsive avatar_";
-			img.alt = "";
-			img.src = "<%=basePath%>/resources/images/"+message.to+".png";
-			span.innerHTML = message.to;
 		}
+		img.className = "img-responsive avatar_";
+		img.alt = "";
+		img.src = "<%=basePath%>/resources/images/"+message.from+".png";
+		span.innerHTML = message.from;
 		var a = document.createElement("a");
 		a.className = "user";
 		a.href = "javascript:void(0);";
