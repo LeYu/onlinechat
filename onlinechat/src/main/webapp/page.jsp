@@ -34,7 +34,6 @@
 	<!-- <h4 id="message"></h4> -->
 </div>
 
-</div>
 	
 <div data-role="content" class="container" role="main">
 	<ul class="content-reply-box mg10" id="message">
@@ -141,12 +140,10 @@
 		div.appendChild(spanS);
 		var divx = document.createElement("div");
 		divx.className = "reply-content pr";
-		
 		var spanx = document.createElement("span");
 		spanx.className = "arrow";
 		spanx.innerHTML = "&nbsp";
 		divx.appendChild(spanx);
-		
 		var content = document.createElement("span");
 		if(message instanceof Object){
 			//pre.innerHTML = JSON.stringify(message);
@@ -160,9 +157,7 @@
 		divx.appendChild(content);
 		div.appendChild(divx);
 		pre.appendChild(div);
-		
 		output.appendChild(pre);
-		
 	}
 	
 	function closeWebSocket(){

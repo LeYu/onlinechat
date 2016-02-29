@@ -36,3 +36,7 @@ if ('WebSocket' in window || 'MozWebSocket' in window){
   list.add(str02);
 方式二：
   ArrayList<String> list = new ArrayList<String>(){{add("str01"); add("str02");}};  
+  
+  
+bootscript 聊天气泡统计
+http://www.ziqiangxuetang.com/try/bootstrap3-badges/
