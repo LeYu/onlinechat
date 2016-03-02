@@ -35,6 +35,13 @@ public class WebSocketEndpoint {
 	private String from;
 	private String to;
 	
+	/**
+	 * A connection is open
+	 *
+	 * @param session
+	 * @param config
+	 * @throws IOException
+	 */
 	@OnOpen
 	public void onOpen(Session session, EndpointConfig config, @PathParam("msgTo") String msgTo) throws IOException {
 		//绑定session到当前对象
@@ -159,10 +166,10 @@ public class WebSocketEndpoint {
 	}
 
 	@OnMessage
-	public void onMessage(String message) throws IOException {
-		System.out.println("收到客户发送信息:" + message);
+	public void onMessage(String jsonMessage) throws IOException {
+		System.out.println("收到客户发送信息:" + jsonMessage);
 		//JSON消息转换为MessageEvent对象
-		MessageEvent event = new ObjectMapper().readValue(message, MessageEvent.class);
+		MessageEvent event = new ObjectMapper().readValue(jsonMessage, MessageEvent.class);
 		//根据当前连接session,获取发送人和收件人
 		event.setFrom(this.from);
 		event.setTo(this.to);
@@ -172,8 +179,21 @@ public class WebSocketEndpoint {
 		broadcastMessage(this.from, this.to, packageMessage);
 	}
 
+	/**
+	 * Close a session
+	 *
+	 * @param session
+	 * @param closeReason
+	 */
 	@OnClose
-	public void onClose(CloseReason reason) throws IOException {
+	public void onClose(Session session, CloseReason closeReason) throws IOException {
+		if(session.isOpen()){
+			try{
+				session.close();
+			} catch(IllegalStateException | IOException ex){
+				
+			}
+		}
 		//更新在线人数
 		subOnlineCount();
 		//创建用户离线通知
